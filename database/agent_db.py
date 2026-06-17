@@ -62,22 +62,53 @@ class AgentDB:
         return is_success
 
     def increment_completed(self, id):
-        pass
+        sql = f"UPDATE agents SET completed_missions = completed_missions + 1 WHERE id = %s"
+        with db().get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql, (id,))
+                is_success = cursor.rowcount > 0
+                conn.commit()
+        return is_success
 
     def increment_failed(self, id):
-        pass
+        sql = f"UPDATE agents SET failed_missions = failed_missions + 1 WHERE id = %s"
+        with db().get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql, (id,))
+                is_success = cursor.rowcount > 0
+                conn.commit()
+        return is_success
 
     def get_agent_performance(self, id):
-        pass
+        sql = "SELECT * FROM agents WHERE id = %s"
+        with db().get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute(sql, (id,))
+                data = cursor.fetchone()
+        completed_missions = data.get("completed_missions")
+        failed_missions = data.get("failed_missions")
+        total_missions = completed_missions + failed_missions
+        success_rate = (completed_missions / total_missions) * 100
+        result = {
+            "total": total_missions,
+            "completed_missions": completed_missions,
+            "failed_missions": failed_missions,
+            "success_rate": success_rate
+        }
+        return result
 
     def count_active_agents(self):
-        pass
+        with db().get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT COUNT(*) FROM agents WHERE is_active = TRUE")
+                active_agents = cursor.fetchone()
+        return active_agents["COUNT(*)"]
 
 
 
 if __name__ == "__main__":
 
-    data = {"name": "Moshe", "specialty": "python", "agent_rank": "Senior", }
+    # data = {"name": "Moshe", "specialty": "python", "agent_rank": "Senior", }
 
-    a = AgentDB().update_agent(1,data )
-    print(a)
+    # a = AgentDB().count_active_agents()
+    # print(a)
