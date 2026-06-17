@@ -6,7 +6,7 @@ class AgentDB:
         allowed_keys = ["name", "specialty", "agent_rank"]
         keys = [k for k in data.keys() if k in allowed_keys]
         keys_str = ", ".join(keys)
-        values = [v for v in data.values()]
+        values = [data[k] for k in keys]
         place_holders = ", ".join(["%s" for _ in values])
         sql = f"INSERT INTO agents ({keys_str}) VALUES ({place_holders})"
         with db().get_connection() as conn:
@@ -27,7 +27,7 @@ class AgentDB:
     def get_agent_by_id(self, id):
         with db().get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
-                cursor.execute(f"SELECT * FROM agents WHERE id = {id}")
+                cursor.execute(f"SELECT * FROM agents WHERE id = %s", (id,))
                 agent = cursor.fetchone()
         return agent
 
@@ -41,9 +41,10 @@ class AgentDB:
             "failed_missions",
             "agent_rank",
         ]
-        keys = [f"{k}=%s" for k in data.keys() if k in allowed_keys]
+        valid_keys = [k for k in data.keys() if k in allowed_keys]
+        keys = [f"{k}=%s" for k in valid_keys]
         keys_str = ", ".join(keys)
-        values = [v for v in data.values()] + [id]
+        values = [data[k] for k in valid_keys + [id]]
         sql = f"UPDATE agents SET {keys_str} WHERE id = %s"
         with db().get_connection() as conn:
             with conn.cursor() as cursor:
@@ -80,15 +81,15 @@ class AgentDB:
         return is_success
 
     def get_agent_performance(self, id):
-        sql = "SELECT * FROM agents WHERE id = %s"
-        with db().get_connection() as conn:
-            with conn.cursor(dictionary=True) as cursor:
-                cursor.execute(sql, (id,))
-                data = cursor.fetchone()
-        completed_missions = data.get("completed_missions")
-        failed_missions = data.get("failed_missions")
+        agent = self.get_agent_by_id(id)
+        if agent is None:
+            raise KeyError("Agent not found")
+        completed_missions = agent.get("completed_missions")
+        failed_missions = agent.get("failed_missions")
         total_missions = completed_missions + failed_missions
-        success_rate = (completed_missions / total_missions) * 100
+        success_rate = 0
+        if total_missions > 0:
+            success_rate = (completed_missions / total_missions) * 100
         result = {
             "total": total_missions,
             "completed_missions": completed_missions,
@@ -106,9 +107,9 @@ class AgentDB:
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # data = {"name": "Moshe", "specialty": "python", "agent_rank": "Senior", }
+#     # data = {"name": "Moshe", "specialty": "python", "agent_rank": "Senior", }
 
-    # a = AgentDB().count_active_agents()
-    # print(a)
+#     # a = AgentDB().count_active_agents()
+#     # print(a)
