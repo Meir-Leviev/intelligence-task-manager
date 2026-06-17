@@ -1,24 +1,32 @@
 import mysql.connector
 
+
 class DBConnection:
 
     def get_connection(self):
-
-        return mysql.connector.connect(
-            host="localhost",
-            port=3306,
-            user="root",
-            password="1234",
-            database="Intelligence_db"
-        )
+        try:
+            conn = mysql.connector.connect(
+                host="localhost",
+                port=3306,
+                user="root",
+                password="1234",
+                database="Intelligence_db",
+            )
+            return conn
+        except Exception as e:
+            print(f"Error with the connection {e}")
+            return None
 
     def create_database(self):
         sql = "CREATE DATABASE IF NOT EXISTS Intelligence_db"
-        with self.get_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(sql)
-                conn.commit()
-
+        conn = self.get_connection()
+        if conn is None:
+        # If I'll use get_connection() and there is no database it will return None
+            conn = mysql.connector.connect(
+                host="localhost", port=3306, user="root", password="1234"
+            )
+        cursor = conn.cursor()
+        cursor.execute(sql)
 
     def create_table(self):
         agent_table = """
@@ -50,6 +58,7 @@ class DBConnection:
                 cursor.execute(agent_table)
                 cursor.execute(missions_table)
                 conn.commit()
+
 
 if __name__ == "__main__":
     DBConnection().create_database()
