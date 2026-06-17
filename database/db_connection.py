@@ -46,8 +46,8 @@ class DBConnection:
                 title VARCHAR(100) NOT NULL,
                 description TEXT,
                 location VARCHAR(100) NOT NULL,
-                difficulty INT CHECK (difficulty > 0 and difficulty < 10) NOT NULL,
-                importance INT CHECK (importance > 0 and importance < 10) NOT NULL,
+                difficulty INT CHECK (difficulty >= 0 and difficulty <= 10) NOT NULL,
+                importance INT CHECK (importance >= 0 and importance <= 10) NOT NULL,
                 status VARCHAR(100) NOT NULL DEFAULT 'NEW',
                 risk_level VARCHAR(100) NOT NULL,
                 assigned_agent_id INT DEFAULT NULL
