@@ -117,6 +117,41 @@ intelligence-task-manager/
 
 
 ---
+## Endpoints
+### `/agents`
+
+| Method | Endpoint | description |
+| :--- | :--- | :--- |
+| POST | /agents | creating a agent |
+| GET | /agents | all agents |
+| GET | /agents/{id} | agent by ID |
+| PUT | /agents/{id} | update agent |
+| PUT | /agents/{id}/deactivate | deactivate agent |
+| PUT | /agents/{id}/performance |  agent performance |
+
+### `/missions`
+
+| Method | Endpoint | description |
+| :--- | :--- | :--- |
+| POST | /missions | creating a mission |
+| GET | /missions | all missions |
+| GET | /missions/{id} | mission by ID |
+| PUT | /missions/{id}/assign/{agent_id} | assigning mission |
+| PUT | /missions/{id}/start | start mission |
+| PUT | /missions/{id}/complete | complete mission |
+| PUT | /missions/{id}/fail | fail mission |
+| PUT | /missions/{id}/cancel | cancel mission |
+
+
+## `/reports`
+
+| Method | Endpoint | description |
+| :--- | :--- | :--- |
+| GET | /reports/summary | general summary |
+| GET | /reports/missions-by-status | missions by status report |
+| GET | /reports/top-agent | the top agent |
+
+
 
 <br>
 
