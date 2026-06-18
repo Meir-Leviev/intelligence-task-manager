@@ -1,4 +1,4 @@
-from db_connection import DBConnection as db
+from database.db_connection import DBConnection as db
 
 
 class AgentDB:
@@ -44,7 +44,7 @@ class AgentDB:
         valid_keys = [k for k in data.keys() if k in allowed_keys]
         keys = [f"{k}=%s" for k in valid_keys]
         keys_str = ", ".join(keys)
-        values = [data[k] for k in valid_keys + [id]]
+        values = [data[k] for k in valid_keys] + [id]
         sql = f"UPDATE agents SET {keys_str} WHERE id = %s"
         with db().get_connection() as conn:
             with conn.cursor() as cursor:
@@ -82,8 +82,6 @@ class AgentDB:
 
     def get_agent_performance(self, id):
         agent = self.get_agent_by_id(id)
-        if agent is None:
-            raise KeyError("Agent not found")
         completed_missions = agent.get("completed_missions")
         failed_missions = agent.get("failed_missions")
         total_missions = completed_missions + failed_missions
