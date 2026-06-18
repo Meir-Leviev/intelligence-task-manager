@@ -1,11 +1,12 @@
 from database.db_connection import DBConnection as db
+import database.mission_db
 
 
 class AgentDB:
     def create_agent(self, data: dict):
         allowed_keys = ["name", "specialty", "agent_rank"]
         keys = [k for k in data.keys() if k in allowed_keys]
-        data["agent_rank"] = data.get("agent_rank").capitalize()
+        # data["agent_rank"] = data.get("agent_rank").capitalize()
         keys_str = ", ".join(keys)
         values = [data[k] for k in keys]
         place_holders = ", ".join(["%s" for _ in values])
@@ -39,8 +40,7 @@ class AgentDB:
             "agent_rank",
             "is_active",
             "completed_missions",
-            "failed_missions",
-            "agent_rank",
+            "failed_missions"
         ]
         valid_keys = [k for k in data.keys() if k in allowed_keys]
         keys = [f"{k}=%s" for k in valid_keys]
@@ -83,12 +83,13 @@ class AgentDB:
 
     def get_agent_performance(self, id):
         agent = self.get_agent_by_id(id)
+        total_missions = database.mission_db.MissionDB().get_open_missions_by_agent(id)
         completed_missions = agent.get("completed_missions")
         failed_missions = agent.get("failed_missions")
-        total_missions = completed_missions + failed_missions
+        total_completed = completed_missions + failed_missions
         success_rate = 0
-        if total_missions > 0:
-            success_rate = (completed_missions / total_missions) * 100
+        if total_completed > 0:
+            success_rate = (completed_missions / total_completed) * 100
         result = {
             "total": total_missions,
             "completed_missions": completed_missions,

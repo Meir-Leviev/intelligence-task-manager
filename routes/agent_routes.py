@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 import logging
 from typing import Literal
 from routes import service
-from database.mission_db import AgentDB
+from database.agent_db import AgentDB
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def add_new_agent(body: NewAgent):
     try:
         logger.info("Creating new agent in tha database")
         agent = db.create_agent(data)
-        logger.info(f"Agent created successfully: id={agent["id"]}")
+        logger.info(f"Agent created successfully: id={agent['id']}")
         return agent
     except Exception:
         logger.exception("Error with the database")
@@ -119,7 +119,7 @@ def deactivate_agent(id: int):
 
 @router.get("/{id}/performance")
 def get_agent_performance(id: int):
-    logger.info(f"PUT /agents/{id}/performance called")
+    logger.info(f"GET /agents/{id}/performance called")
     try:
         logger.info("Checking if agent ID exists")
         exist = service.is_exist_agent(id)

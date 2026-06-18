@@ -27,6 +27,8 @@ class DBConnection:
             )
         cursor = conn.cursor()
         cursor.execute(sql)
+        cursor.close()
+        conn.close()
 
     def create_table(self):
         agent_table = """

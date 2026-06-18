@@ -1,5 +1,5 @@
 from database.db_connection import DBConnection as db
-from database.agent_db import AgentDB
+import database.agent_db
 
 
 class MissionDB:
@@ -62,8 +62,6 @@ class MissionDB:
 
 
     def assign_mission(self, m_id, a_id):
-        mission = self.get_mission_by_id(m_id)
-        agent = AgentDB().get_agent_by_id(a_id)
         sql = "UPDATE missions SET assigned_agent_id = %s, status = 'ASSIGNED' WHERE id = %s"
         with db().get_connection() as conn:
             with conn.cursor() as cursor:
@@ -120,7 +118,7 @@ class MissionDB:
         return active_agents["COUNT(*)"]
 
     def get_top_agent(self):
-        agents = AgentDB().get_all_agents()
+        agents = database.agent_db.AgentDB().get_all_agents()
         top_agent = max(agents, key=lambda a: a["completed_missions"])
         return top_agent
 
