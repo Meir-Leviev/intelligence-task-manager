@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from mysql.connector.errors import DatabaseError
 import logging
-from typing import Literal
 from routes import service
 from database.mission_db import MissionDB
 from database.agent_db import AgentDB
@@ -142,6 +141,8 @@ def complete_mission(id: int):
         success = db.update_mission_status(id, "COMPLETED")
         agent_id = db.get_mission_by_id(id).get("assigned_agent_id")
         if success:
+            logger.info("Found data returning to client")
+            logger.info("Incrementing agent complete")
             AgentDB().increment_completed(agent_id)
             return {"status": "success"}
         raise HTTPException(status_code=400, detail="Mission already complete")
@@ -162,7 +163,9 @@ def complete_failed_mission(id: int):
             raise HTTPException(status_code=404, detail=f"Mission {id} not found")
         success = db.update_mission_status(id, "FAILED")
         if success:
+            logger.info("success")
             agent_id = db.get_mission_by_id(id).get("assigned_agent_id")
+            logger.info("Incrementing agent Fails")
             AgentDB().increment_failed(agent_id)
             return {"status": "success"}
         raise HTTPException(status_code=400, detail="Mission already done")
@@ -183,6 +186,7 @@ def cancel_mission(id: int):
             raise HTTPException(status_code=404, detail=f"Mission {id} not found")
         success = db.update_mission_status(id, "CANCELLED")
         if success:
+            logger.info("success")
             return {"status": "success"}
         raise HTTPException(status_code=500, detail="Server error")
     except HTTPException as e:
