@@ -14,6 +14,21 @@ intelligence-task-manager/
 ├── requirements.txt
 └── .gitignore
 
+intelligence-task-manager/
+├── main.py
+├── database/
+│   ├── agent_db.py
+│   ├── db_connection.py
+│   └── mission_db.py
+├── routes/
+│   ├── agent_routes.py
+│   ├── mission_routes.py
+│   └── report_routes.py
+├── logs/
+│   └── app.log
+├── README.md
+├── requirements.txt
+└── .gitignore
 ```
 <br>
 
