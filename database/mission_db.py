@@ -119,8 +119,10 @@ class MissionDB:
 
     def get_top_agent(self):
         agents = database.agent_db.AgentDB().get_all_agents()
-        top_agent = max(agents, key=lambda a: a["completed_missions"])
-        return top_agent
+        if agents:
+            top_agent = max(agents, key=lambda a: a["completed_missions"])
+            return top_agent
+        return {}
 
 
 if __name__ == "__main__":
