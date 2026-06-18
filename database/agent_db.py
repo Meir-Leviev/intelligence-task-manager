@@ -5,6 +5,7 @@ class AgentDB:
     def create_agent(self, data: dict):
         allowed_keys = ["name", "specialty", "agent_rank"]
         keys = [k for k in data.keys() if k in allowed_keys]
+        data["agent_rank"] = data.get("agent_rank").capitalize()
         keys_str = ", ".join(keys)
         values = [data[k] for k in keys]
         place_holders = ", ".join(["%s" for _ in values])

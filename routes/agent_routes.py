@@ -18,7 +18,7 @@ class UpdateAgent(BaseModel):
     name: str | None = Field(max_length=100, default=None)
     specialty: str | None = Field(max_length=100, default=None)
     agent_rank: None | Literal["Junior", "Senior", "Commander"] = None
-
+    is_active: bool | None = None
 
 db = AgentDB()
 router = APIRouter()
@@ -67,7 +67,7 @@ def get_agent_by_id(id: int):
         raise
     except Exception:
         logger.exception("Unexpected error")
-    raise HTTPException(status_code=500, detail="Server error")
+        raise HTTPException(status_code=500, detail="Server error")
 
 
 

@@ -1,5 +1,5 @@
-from db_connection import DBConnection as db
-from agent_db import AgentDB
+from database.db_connection import DBConnection as db
+from database.agent_db import AgentDB
 
 
 class MissionDB:
@@ -8,7 +8,7 @@ class MissionDB:
         Returns: int
         """
         risk_level = None
-        total = difficulty + importance
+        total = difficulty * 2 + importance
         if 0 <= total <= 9:
             risk_level = "LOW"
         elif 10 <= total <= 17:
@@ -60,39 +60,17 @@ class MissionDB:
                 mission = cursor.fetchone()
         return mission
 
-    def validate_mission_assignment(self, m_id, a_id):
-        """For assign_mission()
-        Returns: bool
-        """
-        mission = self.get_mission_by_id(m_id)
-        if mission.get("status") not in ["NEW", "ASSIGNED"]:
-            raise ValueError("Mission not 'NEW' or 'ASSIGNED'")
-
-        agent = AgentDB().get_agent_by_id(a_id)
-        if not agent.get("is_active"):
-            raise ValueError("Agent not active")
-        if self.get_open_missions_by_agent(a_id) >= 3:
-            raise ValueError("Agent have 3 open missions")
-        if mission.get("risk_level") == "CRITICAL":
-            if agent.get("agent_rank") != "Commander":
-                raise ValueError("CRITICAL mission Commander only")
-        return True
 
     def assign_mission(self, m_id, a_id):
         mission = self.get_mission_by_id(m_id)
-        if mission is None:
-            raise KeyError(f"Mission ID {m_id} not found")
         agent = AgentDB().get_agent_by_id(a_id)
-        if agent is None:
-            raise KeyError(f"Agent ID {a_id} not found")
-        if self.validate_mission_assignment(m_id, a_id):
-            sql = "UPDATE missions SET assigned_agent_id = %s, status = 'ASSIGNED' WHERE id = %s"
-            with db().get_connection() as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute(sql, (a_id, m_id))
-                    is_success = cursor.rowcount > 0
-                    conn.commit()
-            return is_success
+        sql = "UPDATE missions SET assigned_agent_id = %s, status = 'ASSIGNED' WHERE id = %s"
+        with db().get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql, (a_id, m_id))
+                is_success = cursor.rowcount > 0
+                conn.commit()
+        return is_success
 
     def update_mission_status(self, id, status):
         sql = "UPDATE missions SET status = %s WHERE id = %s"
